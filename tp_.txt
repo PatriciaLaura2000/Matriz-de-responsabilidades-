@@ -1,0 +1,251 @@
+A continuación, se presenta un diseño inicial para una aplicación orientada a objetos en Java, utilizando Swing para las pantallas, que abarca la gestión de medios tradicionales audiovisuales, medios tradicionales escritos y redes sociales, siguiendo los requisitos mencionados.
+
+---
+
+### **Estructura de Clases**
+Se diseña una jerarquía de clases para los tipos de medios y se agregan clases específicas para gestionar redes sociales.
+
+#### **Clase Abstracta `Medio`**
+Define los atributos comunes de los medios.
+
+```java
+public abstract class Medio {
+    private String tipo;
+
+    public Medio(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public abstract void mostrarDetalles();
+}
+```
+
+#### **Clase `MedioTradicionalAudiovisual`**
+```java
+public class MedioTradicionalAudiovisual extends Medio {
+    private String nombrePrograma;
+    private int minutos;
+    private double rating;
+
+    public MedioTradicionalAudiovisual(String nombrePrograma, int minutos, double rating) {
+        super("Medio Tradicional Audiovisual");
+        this.nombrePrograma = nombrePrograma;
+        this.minutos = minutos;
+        this.rating = rating;
+    }
+
+    public String getNombrePrograma() {
+        return nombrePrograma;
+    }
+
+    public void setNombrePrograma(String nombrePrograma) {
+        this.nombrePrograma = nombrePrograma;
+    }
+
+    public int getMinutos() {
+        return minutos;
+    }
+
+    public void setMinutos(int minutos) {
+        this.minutos = minutos;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    @Override
+    public void mostrarDetalles() {
+        System.out.println("Programa: " + nombrePrograma + ", Minutos: " + minutos + ", Rating: " + rating);
+    }
+}
+```
+
+#### **Clase `MedioTradicionalEscrito`**
+```java
+public class MedioTradicionalEscrito extends Medio {
+    private String nombreDiario;
+    private String nombreNota;
+    private int visualizaciones;
+
+    public MedioTradicionalEscrito(String nombreDiario, String nombreNota, int visualizaciones) {
+        super("Medio Tradicional Escrito");
+        this.nombreDiario = nombreDiario;
+        this.nombreNota = nombreNota;
+        this.visualizaciones = visualizaciones;
+    }
+
+    public String getNombreDiario() {
+        return nombreDiario;
+    }
+
+    public void setNombreDiario(String nombreDiario) {
+        this.nombreDiario = nombreDiario;
+    }
+
+    public String getNombreNota() {
+        return nombreNota;
+    }
+
+    public void setNombreNota(String nombreNota) {
+        this.nombreNota = nombreNota;
+    }
+
+    public int getVisualizaciones() {
+        return visualizaciones;
+    }
+
+    public void setVisualizaciones(int visualizaciones) {
+        this.visualizaciones = visualizaciones;
+    }
+
+    @Override
+    public void mostrarDetalles() {
+        System.out.println("Diario: " + nombreDiario + ", Nota: " + nombreNota + ", Visualizaciones: " + visualizaciones);
+    }
+}
+```
+
+#### **Clase `RedSocial`**
+```java
+public class RedSocial extends Medio {
+    private String plataforma;
+    private int interacciones;
+
+    public RedSocial(String plataforma, int interacciones) {
+        super("Red Social");
+        this.plataforma = plataforma;
+        this.interacciones = interacciones;
+    }
+
+    public String getPlataforma() {
+        return plataforma;
+    }
+
+    public void setPlataforma(String plataforma) {
+        this.plataforma = plataforma;
+    }
+
+    public int getInteracciones() {
+        return interacciones;
+    }
+
+    public void setInteracciones(int interacciones) {
+        this.interacciones = interacciones;
+    }
+
+    @Override
+    public void mostrarDetalles() {
+        System.out.println("Plataforma: " + plataforma + ", Interacciones: " + interacciones);
+    }
+}
+```
+
+---
+
+### **Pantallas con Swing**
+Se creará una única pantalla principal para gestionar los medios.
+
+#### **Pantalla Principal**
+```java
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class PantallaMedios extends JFrame {
+    private DefaultListModel<Medio> mediosModel = new DefaultListModel<>();
+
+    public PantallaMedios() {
+        setTitle("Gestión de Medios");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Lista de medios
+        JList<Medio> listaMedios = new JList<>(mediosModel);
+        JScrollPane scrollPane = new JScrollPane(listaMedios);
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Panel de botones
+        JPanel panelBotones = new JPanel();
+        JButton btnAgregar = new JButton("Agregar Medio");
+        JButton btnEliminar = new JButton("Eliminar Medio");
+        panelBotones.add(btnAgregar);
+        panelBotones.add(btnEliminar);
+        add(panelBotones, BorderLayout.SOUTH);
+
+        // Acción para agregar
+        btnAgregar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String[] opciones = {"Audiovisual", "Escrito", "Red Social"};
+                String tipo = (String) JOptionPane.showInputDialog(null, "Seleccione el tipo de medio:",
+                        "Nuevo Medio", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+                if (tipo != null) {
+                    agregarMedio(tipo);
+                }
+            }
+        });
+
+        // Acción para eliminar
+        btnEliminar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Medio seleccionado = listaMedios.getSelectedValue();
+                if (seleccionado != null) {
+                    mediosModel.removeElement(seleccionado);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Seleccione un medio para eliminar");
+                }
+            }
+        });
+    }
+
+    private void agregarMedio(String tipo) {
+        if ("Audiovisual".equals(tipo)) {
+            String programa = JOptionPane.showInputDialog("Ingrese el nombre del programa:");
+            int minutos = Integer.parseInt(JOptionPane.showInputDialog("Ingrese los minutos dedicados:"));
+            double rating = Double.parseDouble(JOptionPane.showInputDialog("Ingrese el rating:"));
+            mediosModel.addElement(new MedioTradicionalAudiovisual(programa, minutos, rating));
+        } else if ("Escrito".equals(tipo)) {
+            String diario = JOptionPane.showInputDialog("Ingrese el nombre del diario:");
+            String nota = JOptionPane.showInputDialog("Ingrese el nombre de la nota:");
+            int visualizaciones = Integer.parseInt(JOptionPane.showInputDialog("Ingrese las visualizaciones:"));
+            mediosModel.addElement(new MedioTradicionalEscrito(diario, nota, visualizaciones));
+        } else if ("Red Social".equals(tipo)) {
+            String plataforma = JOptionPane.showInputDialog("Ingrese la plataforma:");
+            int interacciones = Integer.parseInt(JOptionPane.showInputDialog("Ingrese las interacciones:"));
+            mediosModel.addElement(new RedSocial(plataforma, interacciones));
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            PantallaMedios pantalla = new PantallaMedios();
+            pantalla.setVisible(true);
+        });
+    }
+}
+```
+
+---
+
+Este ejemplo crea una pantalla básica para gestionar los medios con la posibilidad de agregar y eliminar elementos. Puedes expandir esta funcionalidad para incluir acciones de modificación o integrarla con una base de datos utilizando JDBC. ¿Te interesa que implementemos estas características?
+
+
+
+
+
